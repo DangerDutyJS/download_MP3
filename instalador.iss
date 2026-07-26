@@ -1,14 +1,14 @@
 [Setup]
 AppId={{214F5D54-EF00-4A30-AC77-D82800306D1E}
 AppName=YouTube Media Downloader Pro
-AppVersion=1.3.1
+AppVersion=1.4.0
 AppMutex=YouTubeMediaDownloaderProMutex
 CloseApplications=yes
 RestartApplications=no
 DefaultDirName={autopf}\YouTube Media Downloader Pro
 DefaultGroupName=YouTube Media Downloader Pro
 OutputDir=dist_installer
-OutputBaseFilename=YouTubeMediaDownloaderPro-1.3.1-setup
+OutputBaseFilename=YouTubeMediaDownloaderPro-1.4.0-setup
 Compression=lzma
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64compatible
@@ -18,6 +18,12 @@ Source: "dist\app.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "yt-dlp.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "ffmpeg\*"; DestDir: "{app}\ffmpeg"; Flags: recursesubdirs ignoreversion
 Source: "icono.ico"; DestDir: "{app}"; Flags: ignoreversion
+#if FileExists("banner.png")
+Source: "banner.png"; DestDir: "{app}"; Flags: ignoreversion
+#endif
+#if FileExists("banner_link.txt")
+Source: "banner_link.txt"; DestDir: "{app}"; Flags: ignoreversion
+#endif
 
 [Icons]
 Name: "{group}\YouTube Media Downloader Pro"; Filename: "{app}\app.exe"; IconFilename: "{app}\icono.ico"

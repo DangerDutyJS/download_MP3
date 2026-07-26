@@ -50,6 +50,11 @@ def build_exe():
     if os.path.exists("icono.ico"):
         shutil.copy2("icono.ico", os.path.join(DIST_DIR, "icono.ico"))
 
+    # Banner publicitario: opcional, se copia si el desarrollador lo agregó.
+    for banner_file in ("banner.png", "banner_link.txt"):
+        if os.path.exists(banner_file):
+            shutil.copy2(banner_file, os.path.join(DIST_DIR, banner_file))
+
     print(f"Listo. .exe generado en: {os.path.abspath(os.path.join(DIST_DIR, 'app.exe'))}")
     print("Carpeta 'dist' lista para distribuir (o usar como fuente del instalador Inno Setup).")
 

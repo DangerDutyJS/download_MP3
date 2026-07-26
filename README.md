@@ -47,3 +47,12 @@ yt-dlp.exe -U
 ```
 
 Vuelve a compilar (`python build_exe.py`) después de actualizar `yt-dlp.exe` para que el `.exe` distribuido incluya la versión nueva.
+
+## Banner publicitario (opcional)
+
+La app puede mostrar un banner estático debajo del encabezado. Es completamente opcional: si no colocas los archivos, la app simplemente no muestra nada ahí.
+
+1. **`banner.png`** — la imagen del banner (ancho recomendado: 760 px, alto libre, p. ej. 90 px), en la raíz del proyecto.
+2. **`banner_link.txt`** — un archivo de texto con una sola línea: la URL que se abre en el navegador al hacer clic en el banner (afiliado, patrocinador, donaciones, etc.). Si no existe, se usa un link de contacto por defecto.
+
+Vuelve a compilar (`python build_exe.py` y luego el instalador con Inno Setup) para que el banner quede incluido. Para cambiar de patrocinador más adelante, solo reemplaza `banner.png` y/o `banner_link.txt` y vuelve a compilar.

@@ -45,6 +45,14 @@ LOG_PATH = os.path.join(DATA_DIR, "app_error.log")
 YT_DLP_PATH = os.path.join(APP_DIR, "yt-dlp.exe")
 FFMPEG_PATH = os.path.join(APP_DIR, "ffmpeg", "bin")
 
+# Banner publicitario estático (opcional). Si "banner.png" no existe junto al
+# .exe, la app simplemente no muestra la franja del banner. El link a abrir al
+# hacer clic se lee de "banner_link.txt" (una URL por línea); si no existe o
+# está vacío, se usa BANNER_LINK_DEFAULT.
+BANNER_IMAGE_PATH = os.path.join(APP_DIR, "banner.png")
+BANNER_LINK_PATH = os.path.join(APP_DIR, "banner_link.txt")
+BANNER_LINK_DEFAULT = "https://wa.me/573135274184"
+
 try:
     logging.basicConfig(
         filename=LOG_PATH,
@@ -392,6 +400,31 @@ def abrir_contacto():
     webbrowser.open("https://wa.me/573135274184")
 
 
+def cargar_banner():
+    if not os.path.exists(BANNER_IMAGE_PATH):
+        return None
+    try:
+        return tk.PhotoImage(file=BANNER_IMAGE_PATH)
+    except (tk.TclError, OSError):
+        logging.exception("No se pudo cargar banner.png")
+        return None
+
+
+def leer_banner_link():
+    try:
+        with open(BANNER_LINK_PATH, "r", encoding="utf-8") as f:
+            link = f.read().strip()
+            if link:
+                return link
+    except (FileNotFoundError, OSError):
+        pass
+    return BANNER_LINK_DEFAULT
+
+
+def abrir_banner(_event=None):
+    webbrowser.open(leer_banner_link())
+
+
 # ==============================================
 # INTERFAZ GRÁFICA
 # ==============================================
@@ -450,12 +483,18 @@ logo_label.pack(side=tk.LEFT, padx=10)
 
 title_frame = ttk.Frame(header_frame)
 title_frame.pack(side=tk.LEFT)
-title_label = ttk.Label(title_frame, text="YouTube MP3 Downloader",
+title_label = ttk.Label(title_frame, text="YouTube Media Downloader",
                         font=('Open Sans', 16, 'bold'), foreground=COLOR_PRIMARIO)
 title_label.pack(anchor='w')
-subtitle_label = ttk.Label(title_frame, text="Descarga música de YouTube en formato MP3",
+subtitle_label = ttk.Label(title_frame, text="Descarga audio o video de YouTube",
                            font=('Open Sans', 10), foreground=COLOR_TEXTO)
 subtitle_label.pack(anchor='w')
+
+banner_img = cargar_banner()
+if banner_img is not None:
+    banner_label = tk.Label(root, image=banner_img, cursor="hand2", bd=0)
+    banner_label.pack(fill=tk.X)
+    banner_label.bind("<Button-1>", abrir_banner)
 
 main_frame = ttk.Frame(root, padding=(20, 15))
 main_frame.pack(fill=tk.BOTH, expand=True)
@@ -527,7 +566,7 @@ log_text.tag_config('process', foreground='#7f8c8d')
 footer_frame = ttk.Frame(root, padding=(15, 10))
 footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
-footer_text = ttk.Label(footer_frame, text="© 2023 Yilmer Carrillo Díaz - Todos los derechos reservados | Versión 1.3.1",
+footer_text = ttk.Label(footer_frame, text="© 2023 Yilmer Carrillo Díaz - Todos los derechos reservados | Versión 1.4.0",
                         font=('Open Sans', 8), foreground='#95a5a6', anchor='center')
 footer_text.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
