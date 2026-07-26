@@ -185,6 +185,7 @@ def iniciar_descarga():
         return
 
     url = limpiar_url(url_original)
+    modo = modo_var.get()
     cancelado_event.clear()
     descarga_en_curso = True
     set_estado_descargando(True)
@@ -193,7 +194,7 @@ def iniciar_descarga():
     log_text.insert(tk.END, f"{timestamp()} Iniciando descarga...\n", 'info')
     log_text.see(tk.END)
 
-    threading.Thread(target=worker_descarga, args=(url, destino), daemon=True).start()
+    threading.Thread(target=worker_descarga, args=(url, destino, modo), daemon=True).start()
 
 
 def cancelar_descarga():
@@ -205,7 +206,7 @@ def cancelar_descarga():
             logging.exception("Error al intentar cancelar la descarga")
 
 
-def worker_descarga(url, destino):
+def worker_descarga(url, destino, modo):
     global proceso_actual
 
     if cancelado_event.is_set():
@@ -213,20 +214,23 @@ def worker_descarga(url, destino):
         cola_eventos.put(('fin', None))
         return
 
-    salida_audio = os.path.join(destino, '%(title).80s.mp3')
+    extension = "mp3" if modo == "audio" else "mp4"
+    salida = os.path.join(destino, f'%(title).80s.{extension}')
     comando = [
         YT_DLP_PATH,
         "--no-playlist",
-        "-x",
-        "--audio-format", "mp3",
         "--ffmpeg-location", FFMPEG_PATH,
         "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
         "--prefer-free-formats",
         "--force-ipv4",
         "--print", f"after_move:{FINAL_FILE_PREFIX}%(filepath)s",
-        "-o", salida_audio,
-        url,
+        "-o", salida,
     ]
+    if modo == "audio":
+        comando += ["-x", "--audio-format", "mp3"]
+    else:
+        comando += ["-f", "bv*+ba/b", "--merge-output-format", "mp4"]
+    comando.append(url)
 
     archivo_final = None
     try:
@@ -270,8 +274,12 @@ def worker_descarga(url, destino):
 def set_estado_descargando(activo):
     if activo:
         download_button.configure(text="⏹ CANCELAR", command=cancelar_descarga)
+        radio_audio.configure(state='disabled')
+        radio_video.configure(state='disabled')
     else:
-        download_button.configure(text="⬇️ DESCARGAR MP3", command=iniciar_descarga)
+        download_button.configure(text="⬇️ DESCARGAR", command=iniciar_descarga)
+        radio_audio.configure(state='normal')
+        radio_video.configure(state='normal')
 
 
 # ==============================================
@@ -476,10 +484,20 @@ browse_button = ttk.Button(destino_entry_frame, text="📂 Examinar",
                            command=seleccionar_carpeta, style='TButton')
 browse_button.pack(side=tk.LEFT)
 
+modo_frame = ttk.Frame(main_frame)
+modo_frame.pack(fill=tk.X, pady=(0, 15))
+modo_var = tk.StringVar(value="audio")
+radio_audio = ttk.Radiobutton(modo_frame, text="🎵 Audio (MP3)", variable=modo_var,
+                              value="audio")
+radio_audio.pack(side=tk.LEFT, padx=(0, 20))
+radio_video = ttk.Radiobutton(modo_frame, text="🎬 Video (MP4)", variable=modo_var,
+                              value="video")
+radio_video.pack(side=tk.LEFT)
+
 button_frame = ttk.Frame(main_frame)
 button_frame.pack(fill=tk.X, pady=(10, 15))
 download_button = ttk.Button(
-    button_frame, text="⬇️ DESCARGAR MP3", command=iniciar_descarga, style='Bold.TButton')
+    button_frame, text="⬇️ DESCARGAR", command=iniciar_descarga, style='Bold.TButton')
 download_button.pack(fill=tk.X, pady=5, ipady=8)
 
 progress_row = ttk.Frame(button_frame)
@@ -509,7 +527,7 @@ log_text.tag_config('process', foreground='#7f8c8d')
 footer_frame = ttk.Frame(root, padding=(15, 10))
 footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
-footer_text = ttk.Label(footer_frame, text="© 2023 Yilmer Carrillo Díaz - Todos los derechos reservados | Versión 1.2.3",
+footer_text = ttk.Label(footer_frame, text="© 2023 Yilmer Carrillo Díaz - Todos los derechos reservados | Versión 1.3.0",
                         font=('Open Sans', 8), foreground='#95a5a6', anchor='center')
 footer_text.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
