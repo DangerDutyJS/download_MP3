@@ -481,7 +481,7 @@ log_text.tag_config('process', foreground='#7f8c8d')
 footer_frame = ttk.Frame(root, padding=(15, 10))
 footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
-footer_text = ttk.Label(footer_frame, text="© 2023 Yilmer Carrillo Díaz - Todos los derechos reservados | Versión 1.2.1",
+footer_text = ttk.Label(footer_frame, text="© 2023 Yilmer Carrillo Díaz - Todos los derechos reservados | Versión 1.2.2",
                         font=('Open Sans', 8), foreground='#95a5a6', anchor='center')
 footer_text.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
