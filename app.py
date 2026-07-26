@@ -18,24 +18,41 @@ from urllib.parse import urlparse, parse_qs
 
 
 def get_app_dir():
-    """Carpeta donde vive el .exe (o el script), estable sin importar el cwd."""
+    """Carpeta donde vive el .exe (o el script): solo lectura (p. ej. Program Files)."""
     if getattr(sys, 'frozen', False):
         return os.path.dirname(sys.executable)
     return os.path.dirname(os.path.abspath(__file__))
 
 
+def get_data_dir():
+    """Carpeta de datos del usuario (config, log): siempre escribible, a diferencia
+    de la carpeta de instalación, que en Program Files requiere permisos de admin."""
+    base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
+    data_dir = os.path.join(base, "YouTube MP3 Downloader Pro")
+    try:
+        os.makedirs(data_dir, exist_ok=True)
+    except OSError:
+        data_dir = os.path.expanduser("~")
+    return data_dir
+
+
 APP_DIR = get_app_dir()
-CONFIG_PATH = os.path.join(APP_DIR, "config.json")
-LOG_PATH = os.path.join(APP_DIR, "app_error.log")
+DATA_DIR = get_data_dir()
+DEFAULT_DESTINO = os.path.join(os.path.expanduser("~"), "Music", "YouTube MP3 Downloader Pro")
+CONFIG_PATH = os.path.join(DATA_DIR, "config.json")
+LOG_PATH = os.path.join(DATA_DIR, "app_error.log")
 YT_DLP_PATH = os.path.join(APP_DIR, "yt-dlp.exe")
 FFMPEG_PATH = os.path.join(APP_DIR, "ffmpeg", "bin")
 
-logging.basicConfig(
-    filename=LOG_PATH,
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    encoding="utf-8",
-)
+try:
+    logging.basicConfig(
+        filename=LOG_PATH,
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        encoding="utf-8",
+    )
+except OSError:
+    logging.getLogger().addHandler(logging.NullHandler())
 
 FINAL_FILE_PREFIX = "__FINAL_FILE__::"
 PROGRESS_RE = re.compile(r'\[download\]\s+(\d{1,3}(?:\.\d+)?)%')
@@ -58,12 +75,12 @@ def timestamp():
 def cargar_config():
     try:
         with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-            return json.load(f).get("carpeta_destino", "download")
+            return json.load(f).get("carpeta_destino", DEFAULT_DESTINO)
     except FileNotFoundError:
-        return "download"
+        return DEFAULT_DESTINO
     except (json.JSONDecodeError, OSError):
         logging.exception("No se pudo leer config.json")
-        return "download"
+        return DEFAULT_DESTINO
 
 
 def guardar_config(carpeta):
@@ -132,7 +149,7 @@ def iniciar_descarga():
         messagebox.showerror("Error", "La URL no parece ser de YouTube.")
         return
 
-    destino = entry_destino.get().strip() or "download"
+    destino = entry_destino.get().strip() or DEFAULT_DESTINO
     try:
         os.makedirs(destino, exist_ok=True)
     except OSError as e:
@@ -464,7 +481,7 @@ log_text.tag_config('process', foreground='#7f8c8d')
 footer_frame = ttk.Frame(root, padding=(15, 10))
 footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
-footer_text = ttk.Label(footer_frame, text="© 2023 Yilmer Carrillo Díaz - Todos los derechos reservados | Versión 1.2.0",
+footer_text = ttk.Label(footer_frame, text="© 2023 Yilmer Carrillo Díaz - Todos los derechos reservados | Versión 1.2.1",
                         font=('Open Sans', 8), foreground='#95a5a6', anchor='center')
 footer_text.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
