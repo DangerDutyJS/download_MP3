@@ -1,6 +1,6 @@
-# YouTube MP3 Downloader Pro
+# YouTube Media Downloader Pro
 
-Aplicación de escritorio (Tkinter) para descargar audio de YouTube en formato MP3, usando `yt-dlp` y `ffmpeg`.
+Aplicación de escritorio (Tkinter) para descargar audio (MP3) o video (MP4) de YouTube, usando `yt-dlp` y `ffmpeg`.
 
 ## Requisitos previos
 

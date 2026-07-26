@@ -29,7 +29,7 @@ def get_data_dir():
     """Carpeta de datos del usuario (config, log): siempre escribible, a diferencia
     de la carpeta de instalación, que en Program Files requiere permisos de admin."""
     base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
-    data_dir = os.path.join(base, "YouTube MP3 Downloader Pro")
+    data_dir = os.path.join(base, "YouTube Media Downloader Pro")
     try:
         os.makedirs(data_dir, exist_ok=True)
     except OSError:
@@ -39,7 +39,7 @@ def get_data_dir():
 
 APP_DIR = get_app_dir()
 DATA_DIR = get_data_dir()
-DEFAULT_DESTINO = os.path.join(os.path.expanduser("~"), "Music", "YouTube MP3 Downloader Pro")
+DEFAULT_DESTINO = os.path.join(os.path.expanduser("~"), "Music", "YouTube Media Downloader Pro")
 CONFIG_PATH = os.path.join(DATA_DIR, "config.json")
 LOG_PATH = os.path.join(DATA_DIR, "app_error.log")
 YT_DLP_PATH = os.path.join(APP_DIR, "yt-dlp.exe")
@@ -69,7 +69,7 @@ cola_eventos = queue.Queue()
 # ==============================================
 # El mismo nombre está referenciado como AppMutex en instalador.iss: le permite
 # al instalador detectar y cerrar la app antes de reemplazar app.exe al actualizar.
-_MUTEX_NAME = "YouTubeMP3DownloaderProMutex"
+_MUTEX_NAME = "YouTubeMediaDownloaderProMutex"
 _ERROR_ALREADY_EXISTS = 183
 _mutex_handle = None
 
@@ -408,14 +408,14 @@ COLOR_INFO = "#3498db"
 if not _adquirir_instancia_unica():
     ctypes.windll.user32.MessageBoxW(
         0,
-        "YouTube MP3 Downloader Pro ya está en ejecución.",
-        "YouTube MP3 Downloader Pro",
+        "YouTube Media Downloader Pro ya está en ejecución.",
+        "YouTube Media Downloader Pro",
         0x40,  # MB_ICONINFORMATION
     )
     sys.exit(0)
 
 root = tk.Tk()
-root.title("YouTube MP3 Downloader Pro")
+root.title("YouTube Media Downloader Pro")
 root.geometry("800x600")
 root.resizable(True, True)
 
@@ -527,7 +527,7 @@ log_text.tag_config('process', foreground='#7f8c8d')
 footer_frame = ttk.Frame(root, padding=(15, 10))
 footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
-footer_text = ttk.Label(footer_frame, text="© 2023 Yilmer Carrillo Díaz - Todos los derechos reservados | Versión 1.3.0",
+footer_text = ttk.Label(footer_frame, text="© 2023 Yilmer Carrillo Díaz - Todos los derechos reservados | Versión 1.3.1",
                         font=('Open Sans', 8), foreground='#95a5a6', anchor='center')
 footer_text.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
