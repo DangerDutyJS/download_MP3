@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+build/
+dist/
+dist_installer/
+app.spec
+app_error.log
+config.json
+download/
+_test_download/
+
+# Binarios de terceros (~200 MB): se descargan aparte, ver README.md
+ffmpeg/
+yt-dlp.exe
