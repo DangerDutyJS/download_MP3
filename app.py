@@ -3,6 +3,7 @@ import re
 import sys
 import json
 import queue
+import ctypes
 import logging
 import threading
 import subprocess
@@ -62,6 +63,24 @@ descarga_en_curso = False
 proceso_actual = None
 cancelado_event = threading.Event()
 cola_eventos = queue.Queue()
+
+# ==============================================
+# INSTANCIA ÚNICA (mutex con nombre)
+# ==============================================
+# El mismo nombre está referenciado como AppMutex en instalador.iss: le permite
+# al instalador detectar y cerrar la app antes de reemplazar app.exe al actualizar.
+_MUTEX_NAME = "YouTubeMP3DownloaderProMutex"
+_ERROR_ALREADY_EXISTS = 183
+_mutex_handle = None
+
+
+def _adquirir_instancia_unica():
+    global _mutex_handle
+    if os.name != "nt":
+        return True
+    _mutex_handle = ctypes.windll.kernel32.CreateMutexW(None, False, _MUTEX_NAME)
+    ya_existe = ctypes.windll.kernel32.GetLastError() == _ERROR_ALREADY_EXISTS
+    return not ya_existe
 
 # ==============================================
 # FUNCIONES AUXILIARES
@@ -378,6 +397,15 @@ COLOR_EXITO = "#27ae60"
 COLOR_ERROR = "#e74c3c"
 COLOR_INFO = "#3498db"
 
+if not _adquirir_instancia_unica():
+    ctypes.windll.user32.MessageBoxW(
+        0,
+        "YouTube MP3 Downloader Pro ya está en ejecución.",
+        "YouTube MP3 Downloader Pro",
+        0x40,  # MB_ICONINFORMATION
+    )
+    sys.exit(0)
+
 root = tk.Tk()
 root.title("YouTube MP3 Downloader Pro")
 root.geometry("800x600")
@@ -481,7 +509,7 @@ log_text.tag_config('process', foreground='#7f8c8d')
 footer_frame = ttk.Frame(root, padding=(15, 10))
 footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
-footer_text = ttk.Label(footer_frame, text="© 2023 Yilmer Carrillo Díaz - Todos los derechos reservados | Versión 1.2.2",
+footer_text = ttk.Label(footer_frame, text="© 2023 Yilmer Carrillo Díaz - Todos los derechos reservados | Versión 1.2.3",
                         font=('Open Sans', 8), foreground='#95a5a6', anchor='center')
 footer_text.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
