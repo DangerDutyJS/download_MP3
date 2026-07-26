@@ -1,13 +1,13 @@
 [Setup]
 AppName=YouTube MP3 Downloader Pro
-AppVersion=1.1.0
-DefaultDirName={pf}\YouTube MP3 Downloader Pro
+AppVersion=1.2.0
+DefaultDirName={autopf}\YouTube MP3 Downloader Pro
 DefaultGroupName=YouTube MP3 Downloader Pro
 OutputDir=dist_installer
-OutputBaseFilename=instalador
+OutputBaseFilename=YouTubeMP3DownloaderPro-1.2.0-setup
 Compression=lzma
 SolidCompression=yes
-ArchitecturesInstallIn64BitMode=x64
+ArchitecturesInstallIn64BitMode=x64compatible
 
 [Files]
 Source: "dist\app.exe"; DestDir: "{app}"; Flags: ignoreversion
